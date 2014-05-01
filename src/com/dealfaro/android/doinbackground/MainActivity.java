@@ -29,6 +29,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -87,6 +88,7 @@ public class MainActivity extends Activity {
 	private void setUsername() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		username = settings.getString(PREF_USERNAME, "");
+		Log.i(LOG_TAG, "Username: " + username);
 		if (username.equals("")) {
 			// We ask the user for a username, and we check that it is unique.
 			// A dialog for entering information, from http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
@@ -131,6 +133,8 @@ public class MainActivity extends Activity {
 	
 	public void clickSettings(View v) {
 		// Goes to the settings activity.
+    	Intent intent = new Intent(this, SettingsActivity.class);
+    	startActivity(intent);
 	}
 	
 
