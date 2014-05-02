@@ -56,8 +56,7 @@ public class MainActivity extends Activity {
 	private String username;
 	
 	// Background downloader.
-	private ServerCall serverCall = null;
-	private ServerCall.ServerConnect downloader = null;
+	private ServerCall downloader = null;
 
 	public static final String PREF_MY_ID = "app_id";
 	public static final String PREF_USERNAME = "username";
@@ -68,7 +67,6 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		serverCall = new ServerCall();
 		
 	     // Initialize random id.
 	     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -115,12 +113,12 @@ public class MainActivity extends Activity {
 					m.put("name", value);
 					m.put("secret", MY_SECRET);
 					m.put("id", myId);
-					spec.params = m;
+					spec.setParams(m);
 					spec.activity = getApplication();
 					// What do we do next.
 					
 					// Initiates server call.
-					downloader = new serverCall.ServerConnect();
+					downloader = new ServerCall();
 					downloader.execute(spec);
 					
 				}
@@ -153,7 +151,7 @@ public class MainActivity extends Activity {
 	}
 	
 	// Checking for username uniqueness.
-	class UsernameSetSpec extends ServerCall.Spec {
+	class UsernameSetSpec extends ServerCallSpec {
 		@Override
 		public void useResult(Application context, String r) {
 			// If we get a null result, the server is down.
@@ -193,14 +191,6 @@ public class MainActivity extends Activity {
 					}
 				}
 			}
-		}
-	}
-	
-	class WhoIsHereSpec extends Spec {
-		@Override
-		public void useResult(Application activity, String r) {
-			// Here goes the Json decoding etc.
-			Log.i(LOG_TAG, "Result to use: " + r);			
 		}
 	}
 	
