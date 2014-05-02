@@ -90,7 +90,7 @@ public class ServerCall extends AsyncTask<ServerCallSpec, String, PostProcessPai
 
 	protected void onPostExecute(PostProcessPair instr) {
 		// This is executed in the UI thread.
-		instr.spec.useResult(instr.spec.activity, instr.result);
+		instr.spec.useResult(instr.spec.context, instr.result);
 	}
 	
 	private static String ConvertStreamToString(InputStream is) {

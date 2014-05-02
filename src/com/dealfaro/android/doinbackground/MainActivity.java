@@ -3,37 +3,16 @@ package com.dealfaro.android.doinbackground;
 // Copyright 2013 Luca de Alfaro.  Released under CC BY License
 // See http://creativecommons.org/licenses/
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -92,7 +71,7 @@ public class MainActivity extends Activity {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		username = settings.getString(PREF_USERNAME, "");
 		Log.i(LOG_TAG, "Username: " + username);
-		if (username.equals("")) {
+		if (true || username.equals("")) {
 			// We ask the user for a username, and we check that it is unique.
 			// A dialog for entering information, from http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -114,8 +93,8 @@ public class MainActivity extends Activity {
 					m.put("secret", MY_SECRET);
 					m.put("id", myId);
 					spec.setParams(m);
-					spec.activity = getApplication();
-					// What do we do next.
+					spec.context = MainActivity.this;
+					dialog.dismiss();
 					
 					// Initiates server call.
 					downloader = new ServerCall();
@@ -153,7 +132,7 @@ public class MainActivity extends Activity {
 	// Checking for username uniqueness.
 	class UsernameSetSpec extends ServerCallSpec {
 		@Override
-		public void useResult(Application context, String r) {
+		public void useResult(Context context, String r) {
 			// If we get a null result, the server is down.
 			// Go to the Network configuration.
 			if (r == null) {
@@ -176,9 +155,11 @@ public class MainActivity extends Activity {
 					TextView uv = (TextView) findViewById(R.id.textViewUsername);
 					uv.setText(result.username);
 				} else {
-					if (false) {
+					if (true) {
 						// Show that there is a problem.
+						Log.i(LOG_TAG, "Gotten into the case");
 						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						Log.i(LOG_TAG, "Built the builder");
 						builder.setTitle("Problem");
 						builder.setMessage("The username is already taken");
 
@@ -187,6 +168,7 @@ public class MainActivity extends Activity {
 								setUsername();
 							}
 						});
+						Log.i(LOG_TAG, "About to show");
 						builder.show();
 					}
 				}
