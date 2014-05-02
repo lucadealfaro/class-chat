@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -30,6 +31,9 @@ public class SendActivity extends Activity {
 	     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 	     myId = settings.getString(MainActivity.PREF_MY_ID, null);
 	     username = settings.getString(MainActivity.PREF_USERNAME, "");
+	     // Makes the progress bar invisible.
+	     ProgressBar pgb = (ProgressBar) findViewById(R.id.progressBar1);
+	     pgb.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -50,10 +54,13 @@ public class SendActivity extends Activity {
 		m.put("dest", dest);
 		m.put("msg", msg);
 		m.put("secret", MainActivity.MY_SECRET);
-		m.put("id", myId);
+		m.put("userid", myId);
 		m.put("username", username);
 		spec.setParams(m);
 		spec.context = getApplication();
+		// Makes the progress bar visible.
+		ProgressBar pgb = (ProgressBar) findViewById(R.id.progressBar1);
+		pgb.setVisibility(View.VISIBLE);
 		// Initiates server call.
 		downloader = new ServerCall();
 		downloader.execute(spec);
@@ -61,7 +68,7 @@ public class SendActivity extends Activity {
 	}
 	
 	
-	// Checking for username uniqueness.
+	// Sends a message.
 	class SendSpec extends ServerCallSpec {
 		@Override
 		public void useResult(Context context, String r) {
@@ -77,9 +84,11 @@ public class SendActivity extends Activity {
 			if (success) {
 				finish();
 			} else {
-				Toast toast = new Toast(getApplicationContext());
-				toast.setDuration(Toast.LENGTH_LONG);
-				toast.setText("Not sent.");
+				// Makes the progress bar visible.
+				ProgressBar pgb = (ProgressBar) findViewById(R.id.progressBar1);
+				pgb.setVisibility(View.GONE);
+				// Makes a toast for failure.
+				Toast toast = Toast.makeText(context, "Network problem: the message has not been sent.", Toast.LENGTH_LONG);
 				toast.show();
 			}
 		}

@@ -58,60 +58,60 @@ public class MainActivity extends Activity {
 	         editor.putString(PREF_MY_ID, myId);
 	         editor.commit();
 	     }
+	     username = settings.getString(PREF_USERNAME, "").trim();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setUsername();
+		Log.i(LOG_TAG, "Username: " + username);
+		TextView uv = (TextView) findViewById(R.id.textViewUsername);
+		uv.setText(username);
+		if (username.equals("")) {
+			setUsername();
+		}
 	}
 	
 	
 	private void setUsername() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		username = settings.getString(PREF_USERNAME, "");
-		Log.i(LOG_TAG, "Username: " + username);
-		if (true || username.equals("")) {
-			// We ask the user for a username, and we check that it is unique.
-			// A dialog for entering information, from http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Welcome");
-			builder.setMessage("Choose Your Username");
+		// We ask the user for a username, and we check that it is unique.
+		// A dialog for entering information, from http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Welcome");
+		builder.setMessage("Choose Your Username");
 
-			// Set an EditText view to get user input 
-			final EditText input = new EditText(this);
-			builder.setView(input);
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		builder.setView(input);
 
-			builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String value = input.getText().toString();
-					// Send value to server, checking for uniqueness.
-					UsernameSetSpec spec = new UsernameSetSpec();
-					spec.url = SERVER_URL_PREFIX + "set_username.json";
-					HashMap<String,String> m = new HashMap<String,String>();
-					m.put("name", value);
-					m.put("secret", MY_SECRET);
-					m.put("id", myId);
-					spec.setParams(m);
-					spec.context = MainActivity.this;
-					dialog.dismiss();
-					
-					// Initiates server call.
-					downloader = new ServerCall();
-					downloader.execute(spec);
-					
-				}
-			});
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getText().toString().trim();
+				// Send value to server, checking for uniqueness.
+				UsernameSetSpec spec = new UsernameSetSpec();
+				spec.url = SERVER_URL_PREFIX + "set_username.json";
+				HashMap<String,String> m = new HashMap<String,String>();
+				m.put("username", value);
+				m.put("secret", MY_SECRET);
+				m.put("userid", myId);
+				spec.setParams(m);
+				spec.context = MainActivity.this;
+				dialog.dismiss();
 
-			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Canceled.
-				}
-			});
+				// Initiates server call.
+				downloader = new ServerCall();
+				downloader.execute(spec);
 
-			builder.show();
+			}
+		});
 
-		}
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Canceled.
+			}
+		});
+
+		builder.show();
 	}
 	
 	
@@ -121,6 +121,10 @@ public class MainActivity extends Activity {
     	startActivity(intent);
 	}
 	
+	public void clickSend(View v) {
+		Intent intent = new Intent(this, SendActivity.class);
+		startActivity(intent);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -128,6 +132,7 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
+	
 	
 	// Checking for username uniqueness.
 	class UsernameSetSpec extends ServerCallSpec {
@@ -155,22 +160,20 @@ public class MainActivity extends Activity {
 					TextView uv = (TextView) findViewById(R.id.textViewUsername);
 					uv.setText(result.username);
 				} else {
-					if (true) {
-						// Show that there is a problem.
-						Log.i(LOG_TAG, "Gotten into the case");
-						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-						Log.i(LOG_TAG, "Built the builder");
-						builder.setTitle("Problem");
-						builder.setMessage("The username is already taken");
+					// Show that there is a problem.
+					Log.i(LOG_TAG, "Gotten into the case");
+					AlertDialog.Builder builder = new AlertDialog.Builder(context);
+					Log.i(LOG_TAG, "Built the builder");
+					builder.setTitle("Problem");
+					builder.setMessage("The username is already taken");
 
-						builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								setUsername();
-							}
-						});
-						Log.i(LOG_TAG, "About to show");
-						builder.show();
-					}
+					builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							setUsername();
+						}
+					});
+					Log.i(LOG_TAG, "About to show");
+					builder.show();
 				}
 			}
 		}
